@@ -1,0 +1,9 @@
+﻿plant, internode+[plant+flower]--//[--leaf]internode[++leaf]-[plantflower]++plantflower
+internode,Fseg[//&&leaf][//^^leaf]Fseg
+leaf,[’{+f-ff-f+|+f-ff-f}]
+flower,[&&&pedicel‘/wedge////wedge////wedge////wedge////wedge]
+pedicel,FF
+wedge,[‘^F][{&&&&-f+f|-f+f}]
+seg,seg[//&&leaf][//^^leaf]Fseg,0.34
+seg,segFseg,0.33
+seg,seg,0.34
