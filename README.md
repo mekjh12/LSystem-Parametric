@@ -1,9 +1,5 @@
 
 ## Parametric LSystem
-```c#
-
-```
-![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/171c36cc-ef93-4bf3-b377-e0c73f30bc40)
 
 ```C#
 GlobalParam gparam = new GlobalParam(0.3f, 0.7f, (float)Math.Sqrt(0.21f));
@@ -69,6 +65,48 @@ MString axiom = MChar.Char("A").ToMString();
 MString sentence = lSystem.Generate(axiom, 11);
 ```
 ![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/d5955f49-bece-4ed1-92a9-d2df1f052569)
+
+```c#
+ GlobalParam gparam = new GlobalParam();
+ gparam.Add("r1", 0.9f);
+ gparam.Add("r2", 0.6f);
+ gparam.Add("a0", 45.0f);
+ gparam.Add("a2", 45.0f);
+ gparam.Add("d", 137.5f);
+ gparam.Add("wr", 0.707f);
+
+ lSystem.AddRule("A", varCount: 2, g: gparam,
+     condition: (t) => true, func: (MChar c, GlobalParam g) =>
+     { 
+         float l = c[0], w = c[1];
+         return MChar.Char("!", w) + MChar.Char("F", l)
+         + MChar.Open + MChar.Char("&", g["a0"]) + MChar.Char("B", l * g["r2"], w * g["wr"]) + MChar.Close
+         + MChar.Char("/", g["d"]) + MChar.Char("A", l * g["r1"], w * g["wr"]);
+     });
+
+ lSystem.AddRule("B", varCount: 2, g: gparam,
+     condition: (t) => true, func: (MChar c, GlobalParam g) =>
+     {
+         float l = c[0], w = c[1];
+         return MChar.Char("!", w) + MChar.Char("F", l)
+         + MChar.Open + MChar.Char("-", g["a2"]) + MChar.Char("$") + MChar.Char("C", l * g["r2"], w * g["wr"]) + MChar.Close
+         + MChar.Char("C", l * g["r1"], w * g["wr"]);
+     });
+
+ lSystem.AddRule("C", varCount: 2, g: gparam,
+     condition: (t) => true, func: (MChar c, GlobalParam g) =>
+     {
+         float l = c[0], w = c[1];
+         return MChar.Char("!", w) + MChar.Char("F", l)
+         + MChar.Open + MChar.Char("+", g["a2"]) + MChar.Char("$") + MChar.Char("B", l * g["r2"], w * g["wr"]) + MChar.Close
+         + MChar.Char("B", l * g["r1"], w * g["wr"]);
+     });
+
+ MString axiom = MChar.Char("A", 1, 10).ToMString();
+ MString sentence = lSystem.Generate(axiom, 10);
+```
+![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/171c36cc-ef93-4bf3-b377-e0c73f30bc40)
+
 
 ## Stochastic L-systems 3d that applies the thickness of tree branches
 
