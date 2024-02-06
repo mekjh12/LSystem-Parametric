@@ -1,5 +1,10 @@
 
 ## Parametric LSystem
+```c#
+
+```
+![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/171c36cc-ef93-4bf3-b377-e0c73f30bc40)
+
 ```C#
 GlobalParam gparam = new GlobalParam(0.3f, 0.7f, (float)Math.Sqrt(0.21f));
 
