@@ -1,3 +1,8 @@
+
+## Parametric LSystem
+
+![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/f5576e6f-61ac-4a20-9cde-34d35f5fa4d6)
+
 ## Stochastic L-systems 3d that applies the thickness of tree branches
 
 ![image](https://github.com/mekjh12/LSystem-Stochastic/assets/122244587/15855fb1-b79b-43c2-b2cf-ab6c8c09eb1d)
