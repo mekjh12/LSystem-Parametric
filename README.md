@@ -41,6 +41,30 @@ MString sentence = lSystem.Generate(axiom, 10);
 ```
 ![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/367a1d2b-a77f-41d2-a84d-c1a978efa01a)
 
+```c#
+GlobalParam gparam = new GlobalParam();
+gparam.Add("R", 1.456f);
+
+lSystem.AddRule("A", varCount: 0, g: gparam,
+    condition: (MChar t) => true,
+    func: (MChar c, GlobalParam g) => {
+        return MChar.Char("F", 1) 
+        + MChar.Open + MChar.Plus + MChar.Char("A") + MChar.Close 
+        + MChar.Open + MChar.Minus + MChar.Char("A") + MChar.Close;
+    });
+
+lSystem.AddRule("F", varCount: 1, g: gparam,
+    condition: (MChar t) => true,
+    func: (MChar c, GlobalParam g) => {
+        float R = g["R"], s = c[0];
+        return MChar.Char("F", s * R).ToMString();
+    });
+
+MString axiom = MChar.Char("A").ToMString();
+MString sentence = lSystem.Generate(axiom, 11);
+```
+![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/d5955f49-bece-4ed1-92a9-d2df1f052569)
+
 ## Stochastic L-systems 3d that applies the thickness of tree branches
 
 ![image](https://github.com/mekjh12/LSystem-Stochastic/assets/122244587/15855fb1-b79b-43c2-b2cf-ab6c8c09eb1d)
