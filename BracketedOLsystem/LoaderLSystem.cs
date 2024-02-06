@@ -6,6 +6,143 @@ namespace LSystem
 {
     class LoaderLSystem
     {
+        public static RawModel3d Load3dByHonda(MString word, GlobalParam g)
+        {
+            List<float> list = new List<float>();
+            List<float> branchList3D = new List<float>();
+
+            // 문자열을 순회하면서 경로를 만든다.
+            Stack<Pose> stack = new Stack<Pose>();
+            Pose pose = new Pose(Quaternion.Identity, Vertex3f.Zero);
+
+            // 줄기의 밑둥의 큰 원이다.
+            Vertex3f[] baseVertor = new Vertex3f[12];
+            float radius = 0.2f;
+            float unitTheta = 360 / baseVertor.Length;
+            for (int i = 0; i < baseVertor.Length; i++)
+            {
+                baseVertor[i] = new Vertex3f((float)(radius * Math.Cos((unitTheta * i).ToRadian())),
+                    (float)(radius * Math.Sin((unitTheta * i).ToRadian())), 0);
+            }
+            Stack<Vertex3f[]> branchBaseStack = new Stack<Vertex3f[]>();
+
+            int idx = 0;
+            float thick = 1.0f;
+
+            while (idx < word.Length)
+            {
+                if (word.Length == 0) break;
+                MChar c = word[idx];
+                Matrix4x4f matQuaternion = (Matrix4x4f)pose.Quaternion;
+                Vertex3f forward = matQuaternion.ForwardVector();
+                Vertex3f up = matQuaternion.UpVector();
+                Vertex3f left = matQuaternion.LeftVector();
+
+                if (c.Alphabet == "F")
+                {
+                    float r = c.Param0;
+                    Vertex3f start = pose.Postiton;
+                    Vertex3f end = start + forward * r;
+
+                    list.Add(start.x);
+                    list.Add(start.y);
+                    list.Add(start.z);
+                    list.Add(end.x);
+                    list.Add(end.y);
+                    list.Add(end.z);
+
+                    (float[] res, Vertex3f[] rot) = LoadBranch(baseVertor, start, end, 0.01f * thick, false);
+                    branchList3D.AddRange(res);
+                    baseVertor = rot;
+
+                    pose.Postiton = end;
+                }
+                else if (c.Alphabet == "f")
+                {
+                    float r = c.Param0;
+                    Vertex3f start = pose.Postiton;
+                    Vertex3f end = start + forward * r;
+
+                    list.Add(start.x);
+                    list.Add(start.y);
+                    list.Add(start.z);
+                    list.Add(end.x);
+                    list.Add(end.y);
+                    list.Add(end.z);
+
+                    pose.Postiton = end;
+                }
+                else if (c.Alphabet == "+")
+                {
+                    float angle = c[0];
+                    pose.Quaternion = up.Rotate(angle).Concatenate(pose.Quaternion);
+                }
+                else if (c.Alphabet == "-")
+                {
+                    float angle = c[0];
+                    pose.Quaternion = up.Rotate(-angle).Concatenate(pose.Quaternion);
+                }
+                else if (c.Alphabet == "&")
+                {
+                    float angle = c[0];
+                    pose.Quaternion = left.Rotate(angle).Concatenate(pose.Quaternion);
+                }
+                else if (c.Alphabet == "^")
+                {
+                    float angle = c[0];
+                    pose.Quaternion = left.Rotate(-angle).Concatenate(pose.Quaternion);
+                }
+                else if (c.Alphabet == "\\")
+                {
+                    pose.Quaternion = forward.Rotate(g["d"]).Concatenate(pose.Quaternion);
+                }
+                else if (c.Alphabet == "/")
+                {
+                    pose.Quaternion = forward.Rotate(-g["d"]).Concatenate(pose.Quaternion);
+                }
+                else if (c.Alphabet == "$")
+                {
+                    Vertex3f V = Vertex3f.UnitZ;
+                    Matrix4x4f mat = ((Matrix4x4f)pose.Quaternion);
+                    Vertex3f H = mat.ForwardVector().Normalized;
+                    Vertex3f L = V.Cross(H).Normalized;
+                    Vertex3f U = H.Cross(L).Normalized;
+                    Matrix3x3f m = Matrix3x3f.Identity;
+                    m.Column(0, L);
+                    m.Column(1, U);
+                    m.Column(2, H);
+                    pose.Quaternion = m.ToQuaternion();
+                }
+                else if (c.Alphabet == "!")
+                {
+                    thick = c[0];
+                }
+                else if (c.Alphabet == "[")
+                {
+                    stack.Push(pose);
+                    branchBaseStack.Push(baseVertor);
+                }
+                else if (c.Alphabet == "]")
+                {
+                    pose = stack.Pop();
+                    baseVertor = branchBaseStack.Pop();
+                }
+
+                idx++;
+            }
+
+            // raw3d 모델을 만든다.
+            uint vao = Gl.GenVertexArray();
+            Gl.BindVertexArray(vao);
+            uint vbo;
+            vbo = StoreDataInAttributeList(0, 3, branchList3D.ToArray());
+            Gl.BindVertexArray(0);
+
+            RawModel3d rawModel = new RawModel3d(vao, branchList3D.ToArray());
+
+            return rawModel;
+        }
+
         /// <summary>
         /// 문장을 가지고 3d모델로 읽어온다. 스택에서 쿼터니온과 위치를 저장한다.
         /// </summary>
@@ -34,7 +171,7 @@ namespace LSystem
                 Vertex3f up = ((Matrix4x4f)pose).UpVector();
                 Vertex3f left = ((Matrix4x4f)pose).LeftVector();
 
-                if (c.Alphabet == "F" || c.Alphabet == "A")
+                if (c.Alphabet == "F" )
                 {
                     float r = c.Param0;
                     Vertex3f start = pos;
@@ -126,7 +263,8 @@ namespace LSystem
         /// <param name="end">줄기가 끝나는 지점</param>
         /// <param name="ratioThick">줄기의 단면의 반지름의 줄어드는 비율</param>
         /// <returns></returns>
-        public static (float[], Vertex3f[] endNPolygon) LoadBranch(Vertex3f[] startNPolygon, Vertex3f start, Vertex3f end, float ratioThick)
+        public static (float[], Vertex3f[] endNPolygon) LoadBranch(Vertex3f[] startNPolygon,
+            Vertex3f start, Vertex3f end, float ratioThick, bool isRelativesize)
         {
             List<float> positionList = new List<float>();
             int num = startNPolygon.Length;
@@ -148,7 +286,8 @@ namespace LSystem
             Vertex3f f = end - start;
             Vertex3f u = f.Cross(s).Normalized;
             Vertex3f l = u.Cross(f).Normalized;
-            evec[0] = start + f + l * (terminalThick);
+
+            evec[0] = isRelativesize ? start + f + l * (terminalThick) : start + f + l * (ratioThick);
 
             float unitDeg = 360.0f / num;
             Vertex3f r0 = evec[0] - start;
@@ -244,7 +383,7 @@ namespace LSystem
                     branchList.Add(end.y);
                     branchList.Add(end.z);
 
-                    (float[] res, Vertex3f[] rot) = LoadBranch(baseVertor, start, end, thickRatio);
+                    (float[] res, Vertex3f[] rot) = LoadBranch(baseVertor, start, end, thickRatio, true);
                     branchList3D.AddRange(res);
 
                     baseVertor = rot;

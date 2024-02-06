@@ -72,7 +72,7 @@ namespace LSystem
                     if (!isBreak) newString += inChar;
                 }
                 mString = newString;
-                Console.WriteLine(i + "=" + newString);
+                //Console.WriteLine(i + "=" + newString);
             }
             return mString;
         }

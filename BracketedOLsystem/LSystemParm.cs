@@ -12,16 +12,22 @@ namespace LSystem
 
     public delegate MString MultiVariableFunc(MChar mchar, GlobalParam g);
 
-    public struct GlobalParam
+    public class GlobalParam
     {
-        float[] _values;
+        Dictionary<string, float> _value;
 
-        public float[] Value => _values;
-
-        public GlobalParam(params float[] values)
+        public GlobalParam()
         {
-            _values = values;
+            _value = new Dictionary<string, float>();
         }
+
+        public void Add(string key, float value)
+        {
+            _value.Add(key, value);
+        }
+
+        public float this[string key] => _value[key];
+        
     }
 
     public struct Production
@@ -74,6 +80,22 @@ namespace LSystem
         public string Alphabet => _alphabet;
 
         public static MChar Char(string alphabet, params float[] values) => new MChar(alphabet, values);
+
+        public static MChar Plus => new MChar("+");
+
+        public static MChar Minus => new MChar("-");
+
+        public static MChar Open => new MChar("[");
+
+        public static MChar Close => new MChar("]");
+
+        public static MChar PitUp => new MChar("^");
+
+        public static MChar PitDown => new MChar("&");
+
+        public static MChar RollLeft => new MChar("\\");
+
+        public static MChar RollRight => new MChar("/");
 
         public MChar(string alphabet, int varCount)
         {

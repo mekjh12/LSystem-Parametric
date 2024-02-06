@@ -80,6 +80,13 @@ namespace LSystem
             return new Vertex3f(mat[0, 0], mat[0, 1], mat[0, 2]).Normalized;
         }
 
+        public static void Column(this ref Matrix3x3f mat, uint col, Vertex3f column)
+        {
+            mat[col, 0] = column.x;
+            mat[col, 1] = column.y;
+            mat[col, 2] = column.z;
+        }
+
         public static Matrix4x4f CreateViewMatrix(Vertex3f pos, Vertex3f right, Vertex3f up, Vertex3f forward)
         {
             Matrix4x4f view = Matrix4x4f.Identity;
@@ -159,5 +166,66 @@ namespace LSystem
         {
             return new Quaternion(axis, degree);
         }
+
+        /// <summary>
+        /// Quaternions for Computer Graphics by John Vince. p199 참고
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
+        public static Quaternion ToQuaternion(this Matrix3x3f mat)
+        {
+            Quaternion q = Quaternion.Identity;
+            float a11 = mat[0, 0];
+            float a12 = mat[1, 0];
+            float a13 = mat[2, 0];
+
+            float a21 = mat[0, 1];
+            float a22 = mat[1, 1];
+            float a23 = mat[2, 1];
+
+            float a31 = mat[0, 2];
+            float a32 = mat[1, 2];
+            float a33 = mat[2, 2];
+
+            float trace = a11 + a22 + a33;
+            if (trace >= -1)
+            {
+                // I changed M_EPSILON to 0
+                float s = 0.5f / (float)Math.Sqrt(trace + 1.0f);
+                q.W = 0.25f / s;
+                q.X = (a32 - a23) * s;
+                q.Y = (a13 - a31) * s;
+                q.Z = (a21 - a12) * s;
+            }
+            else
+            {
+                if (1 + a11 - a22 - a33 >= 0)
+                {
+                    float s = 2.0f * (float)Math.Sqrt(1.0f + a11 - a22 - a33);
+                    q.X = 0.25f * s;
+                    q.Y = (a12 + a21) / s;
+                    q.Z = (a13 + a31) / s;
+                    q.W = (a32 - a23) / s;
+                }
+                else if (1 - a11 + a22 - a33 >= 0)
+                {
+                    float s = 2.0f * (float)Math.Sqrt(1 - a11 + a22 - a33);
+                    q.Y = 0.25f * s;
+                    q.X = (a12 + a21) / s;
+                    q.Z = (a23 + a32) / s;
+                    q.W = (a13 - a31) / s;
+                }
+                else
+                {
+                    float s = 2.0f * (float)Math.Sqrt(1 - a11 - a22 + a33);
+                    q.Z = 0.25f * s;
+                    q.X = (a13 + a31) / s;
+                    q.Y = (a23 + a32) / s;
+                    q.W = (a21 - a12) / s;
+                }
+            }
+            return q;
+        }
+
     }
 }

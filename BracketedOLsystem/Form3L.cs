@@ -75,7 +75,7 @@ namespace LSystem
                 //Gl.Enable(EnableCap.CullFace);
                 //Gl.CullFace(CullFaceMode.Back);
 
-                Gl.ClearColor(0.1f, 0.1f, 0.8f, 1.0f);
+                Gl.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
                 Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
                 Gl.Enable(EnableCap.DepthTest);
 
@@ -153,43 +153,45 @@ namespace LSystem
 
                 LSystemParametric lSystem = new LSystemParametric(_rnd);
 
-                /*
-                lSystem.AddRule("A", 2, condition: (MChar x) => { return x[1] <= 3; },
-                    func: (MChar x) => MString.Null + MChar.Char("A", x[0] * 2, x[0] + x[1]));
+                GlobalParam gparam = new GlobalParam();
+                gparam.Add("r1", 0.9f);
+                gparam.Add("r2", 0.6f);
+                gparam.Add("a0", 45.0f);
+                gparam.Add("a2", 45.0f);
+                gparam.Add("d", 137.5f);
+                gparam.Add("wr", 0.707f);
 
-                lSystem.AddRule("A", 2, condition: (MChar x) => { return x[1] > 3; },
-                    func: (MChar x) => MString.Null + MChar.Char("B", x[0]) 
-                        + MChar.Char("A", x[0] / x[1], 0.0f));
-
-                lSystem.AddRule("B", 1, condition: (MChar x) => { return x[0] < 1; },
-                    func: (MChar x) => MString.Null + MChar.Char("C"));
-
-                lSystem.AddRule("B", 1, condition: (MChar x) => { return x[0] >= 1; },
-                    func: (MChar x) => MString.Null + MChar.Char("B", x[0] - 1));
-                MString axiom = MString.Null + MChar.Char("B", 2.0f) + MChar.Char("A", 4.0f, 4.0f);
-                */
-                GlobalParam gparam = new GlobalParam(0.3f, 0.7f, (float)Math.Sqrt(0.21f));
-
-                lSystem.AddRule("F", varCount: 2, g: gparam,
-                    condition: (MChar t) => (t[1] == 0),
-                    func: (MChar c, GlobalParam g) => {
-                        float x = c[0], t = c[1];
-                        float p = g.Value[0], q = g.Value[1], h = g.Value[2];
-                        return MChar.Char("F", x * p, 2) + MChar.Char("+")
-                        + MChar.Char("F", x * h, 1) + MChar.Char("-") + MChar.Char("-")
-                        + MChar.Char("F", x * h, 1) + MChar.Char("+")
-                        + MChar.Char("F", x * q, 0);
+                lSystem.AddRule("A", varCount: 2, g: gparam,
+                    condition: (t) => true, func: (MChar c, GlobalParam g) =>
+                    { 
+                        float l = c[0], w = c[1];
+                        return MChar.Char("!", w) + MChar.Char("F", l)
+                        + MChar.Open + MChar.Char("&", g["a0"]) + MChar.Char("B", l * g["r2"], w * g["wr"]) + MChar.Close
+                        + MChar.Char("/", g["d"]) + MChar.Char("A", l * g["r1"], w * g["wr"]);
                     });
 
-                lSystem.AddRule("F", varCount: 2, g: gparam, 
-                    condition: (MChar t) => (t[1] > 0),
-                    func: (MChar c, GlobalParam g) => {
-                        return MChar.Char("F", c[0], c[1] - 1).ToMString();
+                lSystem.AddRule("B", varCount: 2, g: gparam,
+                    condition: (t) => true, func: (MChar c, GlobalParam g) =>
+                    {
+                        float l = c[0], w = c[1];
+                        return MChar.Char("!", w) + MChar.Char("F", l)
+                        + MChar.Open + MChar.Char("-", g["a2"]) + MChar.Char("$") + MChar.Char("C", l * g["r2"], w * g["wr"]) + MChar.Close
+                        + MChar.Char("C", l * g["r1"], w * g["wr"]);
                     });
 
-                MString axiom = MChar.Char("F", 10, 0).ToMString();
+                lSystem.AddRule("C", varCount: 2, g: gparam,
+                    condition: (t) => true, func: (MChar c, GlobalParam g) =>
+                    {
+                        float l = c[0], w = c[1];
+                        return MChar.Char("!", w) + MChar.Char("F", l)
+                        + MChar.Open + MChar.Char("+", g["a2"]) + MChar.Char("$") + MChar.Char("B", l * g["r2"], w * g["wr"]) + MChar.Close
+                        + MChar.Char("B", l * g["r1"], w * g["wr"]);
+                    });
+
+                MString axiom = MChar.Char("A", 1, 10).ToMString();
                 MString sentence = lSystem.Generate(axiom, 10);
-                Entity e1 = new Entity(LoaderLSystem.Load3d(sentence, delta: 85.0f), PrimitiveType.Lines);
+                Entity e1 = new Entity(LoaderLSystem.Load3dByHonda(sentence, gparam), PrimitiveType.Triangles);
+                //e1.Yaw(-90);
                 entities.Add(e1);
 
             }
