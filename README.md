@@ -2,7 +2,7 @@
 ## Parametric LSystem
 
 ![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/14c0a22f-3a6a-4dd7-8e65-cb7801e2eb4a)
-```
+```C#
 GlobalParam gparam = new GlobalParam(0.3f, 0.7f, (float)Math.Sqrt(0.21f));
 
 lSystem.AddRule("F", varCount: 2, g: gparam,
