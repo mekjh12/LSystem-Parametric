@@ -26,6 +26,7 @@ MString sentence = lSystem.Generate(axiom, 10);
 ![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/14c0a22f-3a6a-4dd7-8e65-cb7801e2eb4a)
 
 ```C#
+GlobalParam gparam = new GlobalParam(1.456f);
 lSystem.AddRule("A", varCount: 1, g: gparam,
     condition: (MChar t) => true,
     func: (MChar c, GlobalParam g) => {
