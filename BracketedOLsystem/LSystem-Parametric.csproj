@@ -88,28 +88,17 @@
     <Compile Include="Form3L.Designer.cs">
       <DependentUpon>Form3L.cs</DependentUpon>
     </Compile>
-    <Compile Include="FormStochastic.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormStochastic.Designer.cs">
-      <DependentUpon>FormStochastic.cs</DependentUpon>
-    </Compile>
     <Compile Include="IniFile.cs" />
     <Compile Include="Input\Mouse.cs" />
     <Compile Include="LoaderLSystem.cs" />
+    <Compile Include="LSystemParametric.cs" />
+    <Compile Include="LSystemParm.cs" />
     <Compile Include="Model\Entity.cs" />
     <Compile Include="Extension.cs" />
-    <Compile Include="Form1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </Compile>
     <Compile Include="Camera\FPSCamera.cs" />
     <Compile Include="FramePerSecond.cs" />
     <Compile Include="GUID.cs" />
     <Compile Include="Input\KeyBoard.cs" />
-    <Compile Include="LSystem.cs" />
     <Compile Include="Model\Material.cs" />
     <Compile Include="Pose.cs" />
     <Compile Include="Program.cs" />
@@ -125,14 +114,8 @@
     <Compile Include="Model\TexturedModel.cs" />
     <Compile Include="LSystemStochastic.cs" />
     <Content Include="Rules\bushlike2.txt" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Form3L.resx">
       <DependentUpon>Form3L.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormStochastic.resx">
-      <DependentUpon>FormStochastic.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

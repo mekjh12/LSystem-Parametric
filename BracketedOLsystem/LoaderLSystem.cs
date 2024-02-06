@@ -7,6 +7,118 @@ namespace LSystem
     class LoaderLSystem
     {
         /// <summary>
+        /// 문장을 가지고 3d모델로 읽어온다. 스택에서 쿼터니온과 위치를 저장한다.
+        /// </summary>
+        /// <param name="word"></param>
+        /// <param name="delta"></param>
+        /// <param name="branchLength"></param>
+        /// <returns></returns>
+        public static RawModel3d Load3d(MString word, float delta)
+        {
+            List<float> list = new List<float>();
+
+            Quaternion pose = Quaternion.Identity;
+            Vertex3f pos = Vertex3f.Zero;
+
+            // 문자열을 순회하면서 경로를 만든다.
+            Stack<Quaternion> stack = new Stack<Quaternion>();
+            Stack<Vertex3f> posStack = new Stack<Vertex3f>();
+
+            int idx = 0;
+
+            while (idx < word.Length)
+            {
+                if (word.Length == 0) break;
+                MChar c = word[idx];
+                Vertex3f forward = ((Matrix4x4f)pose).ForwardVector();
+                Vertex3f up = ((Matrix4x4f)pose).UpVector();
+                Vertex3f left = ((Matrix4x4f)pose).LeftVector();
+
+                if (c.Alphabet == "F" || c.Alphabet == "A")
+                {
+                    float r = c.Param0;
+                    Vertex3f start = pos;
+                    Vertex3f end = start + forward * r;
+
+                    list.Add(start.x);
+                    list.Add(start.y);
+                    list.Add(start.z);
+                    list.Add(end.x);
+                    list.Add(end.y);
+                    list.Add(end.z);
+
+                    pos = end;
+                }
+                else if (c.Alphabet == "f")
+                {
+                    float r = c.Param0;
+                    Vertex3f start = pos;
+                    Vertex3f end = start + forward * r;
+
+                    list.Add(start.x);
+                    list.Add(start.y);
+                    list.Add(start.z);
+                    list.Add(end.x);
+                    list.Add(end.y);
+                    list.Add(end.z);
+
+                    pos = end;
+                }
+                else if (c.Alphabet == "+")
+                {
+                    pose = up.Rotate(delta).Concatenate(pose);
+                }
+                else if (c.Alphabet == "-")
+                {
+                    pose = up.Rotate(-delta).Concatenate(pose);
+                }
+                else if (c.Alphabet == "|")
+                {
+                    pose = up.Rotate(180).Concatenate(pose);
+                }
+                else if (c.Alphabet == "&")
+                {
+                    pose = left.Rotate(delta).Concatenate(pose);
+                }
+                else if (c.Alphabet == "^")
+                {
+                    pose = left.Rotate(-delta).Concatenate(pose);
+                }
+                else if (c.Alphabet == "\\")
+                {
+                    pose = forward.Rotate(delta).Concatenate(pose);
+                }
+                else if (c.Alphabet == "/")
+                {
+                    pose = forward.Rotate(-delta).Concatenate(pose);
+                }
+                else if (c.Alphabet == "[")
+                {
+                    stack.Push(pose);
+                    posStack.Push(pos);
+                }
+                else if (c.Alphabet == "]")
+                {
+                    pose = stack.Pop();
+                    pos = posStack.Pop();
+                }
+
+                idx++;
+            }
+
+            // raw3d 모델을 만든다.
+            uint vao = Gl.GenVertexArray();
+            Gl.BindVertexArray(vao);
+            uint vbo;
+            vbo = StoreDataInAttributeList(0, 3, list.ToArray());
+            Gl.BindVertexArray(0);
+
+            RawModel3d rawModel = new RawModel3d(vao, list.ToArray());
+
+            return rawModel;
+        }
+
+        /// <summary>
         /// 줄기의 모델을 읽어온다.
         /// </summary>
         /// <param name="startNPolygon">이전 단계의 줄기 윗면의 점들</param>

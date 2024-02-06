@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using System.Windows.Input;
 
 namespace LSystem
 {
@@ -37,7 +36,7 @@ namespace LSystem
             {
                 for (int j = -num; j < num; j++)
                 {
-                    
+
                 }
             }
 
@@ -146,44 +145,53 @@ namespace LSystem
                 _polygonMode = (_polygonMode == PolygonMode.Fill) ?
                     PolygonMode.Line : PolygonMode.Fill;
             }
-            else if (e.KeyCode == Keys.P)
-            {
-                LSystem _lSystem = new LSystem();
-                _lSystem.LoadProductionFromFile(EngineLoop.PROJECT_PATH + @"\Rules\bushlike2.rul");
-                _lSystem.GenerateToFile(axiom: "plant", n: 5, delta: 22.5f,
-                    filename: EngineLoop.PROJECT_PATH + @"\Rules\bushlike2.txt");
-                MessageBox.Show("생성완료!");
-            }
             else if (e.KeyCode == Keys.D1)
             {
                 Entity ent = (entities.Count > 0) ? entities[0] : null;
                 entities.Clear();
                 entities.Add(ent);
 
-                LSystemStochastic _lSystem = new LSystemStochastic(_rnd);
-                _lSystem.LoadProductionFromFile(EngineLoop.PROJECT_PATH + @"\Rules\bushlike2.rul");
-                string words = _lSystem.GenerateStochastic(axiom: "plant", n: 6, delta: 22.0f);
+                LSystemParametric lSystem = new LSystemParametric(_rnd);
 
-                // 필요에 따라 적용한다. (f가 들어가서 그렇다.)
-                words = words.Replace("flower", "");
-                //words = words.Replace("plant", "");
-                //words = words.Replace("internode", "");
-                //words = words.Replace("seg", "");
-                //words = words.Replace("wedge", "");
-                words = words.Replace("leaf", "");
+                /*
+                lSystem.AddRule("A", 2, condition: (MChar x) => { return x[1] <= 3; },
+                    func: (MChar x) => MString.Null + MChar.Char("A", x[0] * 2, x[0] + x[1]));
 
-                (RawModel3d branch, RawModel3d leaf) = 
-                    LoaderLSystem.Load3dWithLeaf(words, _lSystem.Delta, 0.5f, 0.9f);
-                
-                Entity entity = new Entity(branch, PrimitiveType.Triangles);
-                entity.Material = new Material(1.0f, 0.2f, 0.1f, 0.7f);
-                entities.Add(entity);
+                lSystem.AddRule("A", 2, condition: (MChar x) => { return x[1] > 3; },
+                    func: (MChar x) => MString.Null + MChar.Char("B", x[0]) 
+                        + MChar.Char("A", x[0] / x[1], 0.0f));
 
-                Entity leafEntity = new Entity(leaf, PrimitiveType.Triangles);
-                leafEntity.Material = new Material(0.0f, 1.0f, 0.1f, 0.7f);
-                entities.Add(leafEntity);
+                lSystem.AddRule("B", 1, condition: (MChar x) => { return x[0] < 1; },
+                    func: (MChar x) => MString.Null + MChar.Char("C"));
 
-                Console.WriteLine(words);
+                lSystem.AddRule("B", 1, condition: (MChar x) => { return x[0] >= 1; },
+                    func: (MChar x) => MString.Null + MChar.Char("B", x[0] - 1));
+                MString axiom = MString.Null + MChar.Char("B", 2.0f) + MChar.Char("A", 4.0f, 4.0f);
+                */
+                GlobalParam gparam = new GlobalParam(0.3f, 0.7f, (float)Math.Sqrt(0.21f));
+
+                lSystem.AddRule("F", varCount: 2, g: gparam,
+                    condition: (MChar t) => (t[1] == 0),
+                    func: (MChar c, GlobalParam g) => {
+                        float x = c[0], t = c[1];
+                        float p = g.Value[0], q = g.Value[1], h = g.Value[2];
+                        return MChar.Char("F", x * p, 2) + MChar.Char("+")
+                        + MChar.Char("F", x * h, 1) + MChar.Char("-") + MChar.Char("-")
+                        + MChar.Char("F", x * h, 1) + MChar.Char("+")
+                        + MChar.Char("F", x * q, 0);
+                    });
+
+                lSystem.AddRule("F", varCount: 2, g: gparam, 
+                    condition: (MChar t) => (t[1] > 0),
+                    func: (MChar c, GlobalParam g) => {
+                        return MChar.Char("F", c[0], c[1] - 1).ToMString();
+                    });
+
+                MString axiom = MChar.Char("F", 10, 0).ToMString();
+                MString sentence = lSystem.Generate(axiom, 10);
+                Entity e1 = new Entity(LoaderLSystem.Load3d(sentence, delta: 85.0f), PrimitiveType.Lines);
+                entities.Add(e1);
+
             }
         }
     }
