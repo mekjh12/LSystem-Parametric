@@ -42,6 +42,7 @@ MString sentence = lSystem.Generate(axiom, 10);
 ```
 ![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/367a1d2b-a77f-41d2-a84d-c1a978efa01a)
 
+## elongation
 ```c#
 GlobalParam gparam = new GlobalParam();
 gparam.Add("R", 1.456f);
