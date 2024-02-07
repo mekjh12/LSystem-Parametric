@@ -56,6 +56,11 @@ namespace LSystem
             return (float)Math.Sqrt(a.Dot(a));
         }
 
+        public static float Norm2(this Vertex3f a)
+        {
+            return a.Dot(a);
+        }
+
         public static Matrix4x4f Scaled(Vertex3f scale)
         {
             Matrix4x4f mat = Matrix4x4f.Identity;
@@ -135,6 +140,22 @@ namespace LSystem
         }
 
         /// <summary>
+        /// matrix의 값은 상관없이 f, r, u에 의하여 3x3행렬을 반환한다.
+        /// </summary>
+        /// <param name="m"></param>
+        /// <param name="f"></param>
+        /// <param name="r"></param>
+        /// <param name="u"></param>
+        /// <returns></returns>
+        public static Quaternion ToQuaternionFromTNB(this Matrix3x3f m, Vertex3f r, Vertex3f u, Vertex3f f)
+        {
+            m.Column(0, r);
+            m.Column(1, u);
+            m.Column(2, f);
+            return m.ToQuaternion();
+        }
+
+        /// <summary>
         /// 쿼터니온의 곱을 반환한다. 
         /// OpenGL.Quaternion의 곱의 연산 오류로 인하여 새롭게 구현하였다.
         /// 순서는 q2.Concatenate(q1)의 의미는 q1을 적용한 후에 q2를 적용한다.
@@ -156,10 +177,17 @@ namespace LSystem
 
         public static Vertex3f Rotate(this Vertex3f axis, Vertex3f dst, float degree)
         {
-            Quaternion q = axis.Rotate(degree);
-            Matrix3x3f mat = ((Matrix3x3f)q);
-            Vertex3f src = mat * dst;
-            return src;
+            if (axis.x == 0 && axis.y == 0)
+            {
+                return axis.z > 0 ? Matrix3x3f.RotatedZ(degree) * dst : Matrix3x3f.RotatedZ(-degree) * dst;
+            }
+            else
+            {
+                Quaternion q = axis.Rotate(degree);
+                Matrix3x3f mat = ((Matrix3x3f)q);
+                Vertex3f src = mat * dst;
+                return src;
+            }
         }
 
         public static Quaternion Rotate(this Vertex3f axis, float degree)
@@ -227,5 +255,14 @@ namespace LSystem
             return q;
         }
 
+        public static string String(this Stack<string> stack)
+        {
+            string txt = "";
+            foreach (string item in stack)
+            {
+                txt += item;
+            }
+            return txt;
+        }
     }
 }

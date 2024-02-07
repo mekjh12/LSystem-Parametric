@@ -65,21 +65,11 @@ namespace LSystem
             set => _parametric = value;
         }
 
-        public float Param0
-        {
-            get => _parametric[0];
-            set => _parametric[0] = value;
-        }
-
-        public float Param1
-        {
-            get => _parametric[1];
-            set => _parametric[1] = value;
-        }
-
         public string Alphabet => _alphabet;
 
         public static MChar Char(string alphabet, params float[] values) => new MChar(alphabet, values);
+
+        public static MChar A => new MChar("A");
 
         public static MChar Plus => new MChar("+");
 

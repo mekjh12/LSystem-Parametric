@@ -1,6 +1,7 @@
 ﻿using OpenGL;
 using System;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 using System.Windows.Forms;
 
 namespace LSystem
@@ -154,46 +155,45 @@ namespace LSystem
                 LSystemParametric lSystem = new LSystemParametric(_rnd);
 
                 GlobalParam gparam = new GlobalParam();
-                gparam.Add("r1", 0.9f);
-                gparam.Add("r2", 0.6f);
-                gparam.Add("a0", 45.0f);
-                gparam.Add("a2", 45.0f);
-                gparam.Add("d", 137.5f);
-                gparam.Add("wr", 0.707f);
+                gparam.Add("d1", 180.0f);
+                gparam.Add("d2", 252.0f);
+                gparam.Add("a", 36.0f);
+                gparam.Add("lr", 1.07f);
+                gparam.Add("vr", 1.732f);
+                gparam.Add("Tx", -0.61f);
+                gparam.Add("Ty", 0.77f);
+                gparam.Add("Tz", -0.19f);
+                gparam.Add("e", 0.40f);
 
-                lSystem.AddRule("A", varCount: 2, g: gparam,
-                    condition: (t) => true, func: (MChar c, GlobalParam g) =>
-                    { 
-                        float l = c[0], w = c[1];
-                        return MChar.Char("!", w) + MChar.Char("F", l)
-                        + MChar.Open + MChar.Char("&", g["a0"]) + MChar.Char("B", l * g["r2"], w * g["wr"]) + MChar.Close
-                        + MChar.Char("/", g["d"]) + MChar.Char("A", l * g["r1"], w * g["wr"]);
-                    });
-
-                lSystem.AddRule("B", varCount: 2, g: gparam,
+                lSystem.AddRule("A", varCount: 0, g: gparam,
                     condition: (t) => true, func: (MChar c, GlobalParam g) =>
                     {
-                        float l = c[0], w = c[1];
-                        return MChar.Char("!", w) + MChar.Char("F", l)
-                        + MChar.Open + MChar.Char("-", g["a2"]) + MChar.Char("$") + MChar.Char("C", l * g["r2"], w * g["wr"]) + MChar.Close
-                        + MChar.Char("C", l * g["r1"], w * g["wr"]);
+                        return MChar.Char("!", g["vr"]) + MChar.Char("F", 0.5f)
+                        + MChar.Open + MChar.Char("&", g["a"]) + MChar.Char("F", 0.5f) + MChar.Char("A") + MChar.Close
+                        + MChar.Char("/", g["d1"])
+                        + MChar.Open + MChar.Char("&", g["a"]) + MChar.Char("F", 0.5f) + MChar.Char("A") + MChar.Close
+                        + MChar.Char("/", g["d2"])
+                        + MChar.Open + MChar.Char("&", g["a"]) + MChar.Char("F", 0.5f) + MChar.Char("A") + MChar.Close;
                     });
 
-                lSystem.AddRule("C", varCount: 2, g: gparam,
+                lSystem.AddRule("F", varCount: 1, g: gparam,
                     condition: (t) => true, func: (MChar c, GlobalParam g) =>
                     {
-                        float l = c[0], w = c[1];
-                        return MChar.Char("!", w) + MChar.Char("F", l)
-                        + MChar.Open + MChar.Char("+", g["a2"]) + MChar.Char("$") + MChar.Char("B", l * g["r2"], w * g["wr"]) + MChar.Close
-                        + MChar.Char("B", l * g["r1"], w * g["wr"]);
+                        float l = c[0];
+                        return MChar.Char("F", l * g["lr"]).ToMString();
                     });
 
-                MString axiom = MChar.Char("A", 1, 10).ToMString();
-                MString sentence = lSystem.Generate(axiom, 10);
-                Entity e1 = new Entity(LoaderLSystem.Load3dByHonda(sentence, gparam), PrimitiveType.Triangles);
-                //e1.Yaw(-90);
+                lSystem.AddRule("!", varCount: 1, g: gparam,
+                    condition: (t) => true, func: (MChar c, GlobalParam g) =>
+                    {
+                        float w = c[0];
+                        return MChar.Char("!", w * g["vr"]).ToMString();
+                    });
+
+                MString axiom = MChar.Char("!", 1) + MChar.Char("F", 2) + MChar.Char("/", 45) + MChar.A;
+                MString sentence = lSystem.Generate(axiom, 7);
+                Entity e1 = new Entity(LoaderLSystem.Load3dByAonoKunii(sentence, gparam), PrimitiveType.Triangles);
                 entities.Add(e1);
-
             }
         }
     }
