@@ -142,6 +142,10 @@ MString sentence = lSystem.Generate(axiom, 11);
 ```
 ![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/d63c863c-423d-4eaf-b059-ecca7c799e25)
 
+## Tree
+
+![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/86b079f0-e554-4945-87cf-096b947561bc)
+
 # Stochastic L-systems 3d that applies the thickness of tree branches
 
 ![image](https://github.com/mekjh12/LSystem-Stochastic/assets/122244587/15855fb1-b79b-43c2-b2cf-ab6c8c09eb1d)
