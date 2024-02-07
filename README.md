@@ -1,5 +1,5 @@
 
-## Parametric LSystem
+# Parametric LSystem
 
 ```C#
 GlobalParam gparam = new GlobalParam(0.3f, 0.7f, (float)Math.Sqrt(0.21f));
@@ -66,7 +66,7 @@ MString sentence = lSystem.Generate(axiom, 11);
 ```
 ![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/d5955f49-bece-4ed1-92a9-d2df1f052569)
 
-* Honda
+## Honda
 ```c#
  GlobalParam gparam = new GlobalParam();
  gparam.Add("r1", 0.9f);
@@ -109,7 +109,7 @@ MString sentence = lSystem.Generate(axiom, 11);
 ![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/171c36cc-ef93-4bf3-b377-e0c73f30bc40)
 
 
-# Aono and Kunii
+## Aono and Kunii
 ```c#
  GlobalParam gparam = new GlobalParam();
  gparam.Add("r1", 0.9f);
@@ -142,18 +142,18 @@ MString sentence = lSystem.Generate(axiom, 11);
 ```
 ![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/d63c863c-423d-4eaf-b059-ecca7c799e25)
 
-## Stochastic L-systems 3d that applies the thickness of tree branches
+# Stochastic L-systems 3d that applies the thickness of tree branches
 
 ![image](https://github.com/mekjh12/LSystem-Stochastic/assets/122244587/15855fb1-b79b-43c2-b2cf-ab6c8c09eb1d)
 
-## Stochastic L-systems 3d
+# Stochastic L-systems 3d
 
 ![image](https://github.com/mekjh12/LSystem/assets/122244587/a21dbfcd-bd57-49bc-8867-411d06a68891)
 
-## Edge ReWriting
+# Edge ReWriting
 
 ![image](https://github.com/mekjh12/LSystem/assets/122244587/4d599def-9a53-4d15-952e-0a3c5916779c)
 
-## Node ReWriting
+# Node ReWriting
 
 ![image](https://github.com/mekjh12/LSystem/assets/122244587/84b6572d-2454-4a52-bba2-6b6c452440cc)
