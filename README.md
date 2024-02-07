@@ -142,7 +142,47 @@ MString sentence = lSystem.Generate(axiom, 11);
 ```
 ![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/d63c863c-423d-4eaf-b059-ecca7c799e25)
 
-## Tree
+## Tree Generated with Tropsim vector
+```c#
+ GlobalParam gparam = new GlobalParam();
+ gparam.Add("d1", 180.0f);
+ gparam.Add("d2", 252.0f);
+ gparam.Add("a", 36.0f);
+ gparam.Add("lr", 1.07f);
+ gparam.Add("vr", 1.732f);
+ gparam.Add("Tx", -0.61f);
+ gparam.Add("Ty", 0.77f);
+ gparam.Add("Tz", -0.19f);
+ gparam.Add("e", 0.40f);
+
+ lSystem.AddRule("A", varCount: 0, g: gparam,
+     condition: (t) => true, func: (MChar c, GlobalParam g) =>
+     {
+         return MChar.Char("!", g["vr"]) + MChar.Char("F", 0.5f)
+         + MChar.Open + MChar.Char("&", g["a"]) + MChar.Char("F", 0.5f) + MChar.Char("A") + MChar.Close
+         + MChar.Char("/", g["d1"])
+         + MChar.Open + MChar.Char("&", g["a"]) + MChar.Char("F", 0.5f) + MChar.Char("A") + MChar.Close
+         + MChar.Char("/", g["d2"])
+         + MChar.Open + MChar.Char("&", g["a"]) + MChar.Char("F", 0.5f) + MChar.Char("A") + MChar.Close;
+     });
+
+ lSystem.AddRule("F", varCount: 1, g: gparam,
+     condition: (t) => true, func: (MChar c, GlobalParam g) =>
+     {
+         float l = c[0];
+         return MChar.Char("F", l * g["lr"]).ToMString();
+     });
+
+ lSystem.AddRule("!", varCount: 1, g: gparam,
+     condition: (t) => true, func: (MChar c, GlobalParam g) =>
+     {
+         float w = c[0];
+         return MChar.Char("!", w * g["vr"]).ToMString();
+     });
+
+ MString axiom = MChar.Char("!", 1) + MChar.Char("F", 2) + MChar.Char("/", 45) + MChar.A;
+ MString sentence = lSystem.Generate(axiom, 7);
+```
 
 ![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/86b079f0-e554-4945-87cf-096b947561bc)
 
