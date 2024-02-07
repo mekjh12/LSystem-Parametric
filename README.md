@@ -109,6 +109,39 @@ MString sentence = lSystem.Generate(axiom, 11);
 ![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/171c36cc-ef93-4bf3-b377-e0c73f30bc40)
 
 
+# Aono and Kunii
+```c#
+ GlobalParam gparam = new GlobalParam();
+ gparam.Add("r1", 0.9f);
+ gparam.Add("r2", 0.7f);
+ gparam.Add("a1", 10.0f);
+ gparam.Add("a2", 60.0f);
+ gparam.Add("wr", 0.707f);
+
+ lSystem.AddRule("A", varCount: 2, g: gparam,
+     condition: (t) => true, func: (MChar c, GlobalParam g) =>
+     {
+         float l = c[0], w = c[1];
+         return MChar.Char("!", w) + MChar.Char("F", l)
+         + MChar.Open + MChar.Char("&", g["a1"]) + MChar.Char("B", l * g["r1"], w * g["wr"]) + MChar.Close
+         + MChar.Char("/", 180)
+         + MChar.Open + MChar.Char("&", g["a2"]) + MChar.Char("B", l * g["r2"], w * g["wr"]) + MChar.Close;
+     });
+
+ lSystem.AddRule("B", varCount: 2, g: gparam,
+     condition: (t) => true, func: (MChar c, GlobalParam g) =>
+     {
+         float l = c[0], w = c[1];
+         return MChar.Char("!", w) + MChar.Char("F", l)
+         + MChar.Open + MChar.Char("+", g["a1"]) + MChar.Char("$") + MChar.Char("B", l * g["r1"], w * g["wr"]) + MChar.Close
+         + MChar.Open + MChar.Char("-", g["a2"]) + MChar.Char("$") + MChar.Char("B", l * g["r2"], w * g["wr"]) + MChar.Close;
+     });
+
+ MString axiom = MChar.Char("A", 1, 10).ToMString();
+ MString sentence = lSystem.Generate(axiom, 10);
+```
+![image](https://github.com/mekjh12/LSystem-Parametric/assets/122244587/d63c863c-423d-4eaf-b059-ecca7c799e25)
+
 ## Stochastic L-systems 3d that applies the thickness of tree branches
 
 ![image](https://github.com/mekjh12/LSystem-Stochastic/assets/122244587/15855fb1-b79b-43c2-b2cf-ab6c8c09eb1d)
